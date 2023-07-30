@@ -1,0 +1,104 @@
+
+
+{% extends 'blog/base.html' %}
+
+{% block main_area %}
+      {% if user.is_authenticated %}
+        {% if user.is_superuser or user.is_staff %}
+            <a href="/blog/create_post/" role="button"
+               class="btn btn-info btn-sm float-right">
+                <i class="fas fa-pen">New Post</i>
+            </a>
+        {% endif %}
+      {% endif %}
+        <h2>Blog
+            {% if search_info %}
+            <span class="badge badge-secondary">{{search_info}}</span>
+            {% endif %}
+            {% if category %}
+                - <span class="badge badge-secondary">{{ category }}</span>   <!--카테고리에 배지 적용-->
+            {% endif %}
+            {% if tag %}
+                - <i class="fas fa-tag"></i>
+                <span class="badge badge-secondary">
+                    {{ tag }} ({{tag.post_set.count}})
+                </span>
+            {% endif %}
+        </h2>
+        <!-- Featured blog post-->
+          {% if post_list.exists %}  <!--게시물이 존재 한다면,-->
+          {% for p in post_list %}
+            <!--헤드 이미지 출력-->
+          <div class="card mb-4" id="post-{{p.pk}}">  <!--NoneType 어쩌구 오류 해결-->
+              {% if p.head_image %} <!--이미지 업로한 경우-->
+              <a href="#!"><img class="card-img-top" src="{{p.head_image.url}}" alt="{{p}}의 head_image" /></a>
+              {% else %} <!--이미지 업로드하지 않은 경우 : 랜덤 이미지 생성 후 고정-->
+              <img class="card-img-top" src="https://picsum.photos/seed/{{p.pk}}//800/200" alt="random image" />
+              {% endif %}
+
+              <div class="card-body">
+                  {% if p.category %} <!--카테고리가 있는 경우와 배지 설정-->
+                    <span class="badge badge-secondary float-right">
+                        <a href="{{p.category.get_absolute_url}}">{{p.category}}</a>
+                    </span>
+                  {% else %} <!--카테고리가 있는 경우-->
+                    <span class="badge badge-secondary float-right">
+                        <a href="/blog/category/no_category/">미분류</a>
+                    </span>
+                  {% endif %}
+
+                  <h2 class="card-title">{{p.title | upper}}</h2>
+                  {% if p.hook_text %} <!--미리보기, 요약 글 (중간 타이틀?)-->
+                  <h5 class="text-muted">{{p.hook_text}}</h5>  <!--회색톤-->
+                  {% endif %}
+                  <p class="card-text">{{p.content | truncatechars:100}}</p> <!--출력 글자 수 제한하기(미리보기)-->
+                  {% if p.tags.exists %}
+                    <i class="fas fa-tag"></i>
+                    {% for t in p.tags.iterator %} <!--for문으로 돌릴 수 있게 만듬-->
+                        <span class="badge badge-pill badge-light">
+                            <a href="{{t.get_absolute_url}}">{{t}}</a>
+                        </span>
+                    {% endfor %}
+                    <br><br>
+                  {% endif %}
+                  <a class="btn btn-primary" href="{{p.get_absolute_url}}">Read more →</a>
+            </div>
+            <div class="card-footer">
+                <div class="small text-muted">{{p.created_at | date:"Y-m-d h:m:s"}}</div>
+                <a href="#">{{p.author | upper}}</a>
+            </div>
+        </div>
+          {% endfor %}
+          {% else %} <!--게시물이 존재하지 않는 경우-->
+            <h5>아무 게시물이 없습니다.</h5>
+          {% endif %}
+
+        <!-- Pagination-->
+        {% if is_paginated %}
+        <nav aria-label="Pagination">
+          <hr class="my-0" />
+          <ul class="pagination justify-content-center my-4">
+              {% if page_obj.has_previous %}
+              <li class="page-item"><a class="page-link" href="?page={{page_obj.previous_page_number}}" tabindex="-1" aria-disabled="true">Newer</a></li>
+              {% else %}
+              <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Newer</a></li>
+              {% endif %}
+              {% if page_obj.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{page_obj.next_page_number}}">Older</a></li>
+              {% else %}
+              <li class="page-item disabled"><a class="page-link" href="#!">Older</a></li>
+              {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+{% endblock %}
+
+
+<!-- FBV 방식
+{% for p in posts %}
+    <hr/>
+    <h2><a href ="{{get_absolute_url}}">{{p.title}}</a></h2>
+    <h4>{{p.created_at}}</h4>
+    <p>{{p.content}}</p>
+{% endfor %}
+-->

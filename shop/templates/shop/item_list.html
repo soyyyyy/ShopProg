@@ -1,0 +1,109 @@
+
+{% extends 'shop/base.html' %}
+
+{% block main_area %}
+      {% if user.is_authenticated %}
+        {% if user.is_superuser or user.is_staff %}
+            <a href="/shop/create_item/" role="button"
+               class="btn btn-info btn-sm float-right">
+                <i class="fas fa-pen">New Item</i>
+            </a>
+        {% endif %}
+      {% endif %}
+        <h2>FilmShop
+            {% if search_info %}
+            <span class="badge badge-secondary">{{search_info}}</span>
+            {% endif %}
+            {% if category %}
+                - <span class="badge badge-secondary">{{ category }}</span>
+            {% endif %}
+            {% if manufacturer %}
+                - <span class="badge badge-secondary">{{ manufacturer }}</span>
+            {% endif %}
+            {% if tag %}
+                - <i class="fas fa-tag"></i>
+                <span class="badge badge-secondary">
+                    {{ tag }} ({{tag.item_set.count}})
+                </span>
+            {% endif %}
+        </h2>
+
+        <!-- Featured blog post-->
+          {% if item_list.exists %}
+          {% for i in item_list %}
+
+          <div class="card mb-4" id="item-{{i.pk}}">
+              {% if i.head_image %}
+              <a href="#!"><img class="card-img-top" src="{{i.head_image.url}}" alt="{{i}}의 head_image" /></a>
+              {% else %}
+              <img class="card-img-top" src="https://picsum.photos/seed/{{i.pk}}//800/200" alt="random image" />
+              {% endif %}
+
+              <div class="card-body">
+                  {% if i.category %}
+                    <span class="badge badge-secondary float-right">
+                        <a href="{{i.category.get_absolute_url}}">{{i.category}}</a>
+                    </span>
+                  {% else %}
+                    <span class="badge badge-secondary float-right">
+                        <a href="/shop/category/no_category/">미분류</a>
+                    </span>
+                  {% endif %}
+
+                  {% if i.manufacturer %}
+                    <span class="badge badge-secondary float-right">
+                        <a href="{{i.manufacturer.get_absolute_url}}">{{i.manufacturer}}</a>
+                    </span>
+                  {% else %}
+                    <span class="badge badge-secondary float-right">
+                        <a href="/shop/manufacturer/no_manufacturer/">미분류</a>
+                    </span>
+                  {% endif %}
+
+
+                  <h2 class="card-title">{{i.name | upper}}</h2>
+                  <h4>{{i.price}}원</h4>
+                  {% if i.hook_text %}
+                  <h5 class="text-muted">{{i.hook_text}}</h5>  <
+                  {% endif %}
+                  <p class="card-text">{{ i.get_content_markdown | truncatechars_html:40 | safe }}</p>
+                  {% if i.tags.exists %}
+                    <i class="fas fa-tag"></i>
+                    {% for t in i.tags.iterator %}
+                        <span class="badge badge-pill badge-light">
+                            <a href="{{t.get_absolute_url}}">{{t}}</a>
+                        </span>
+                    {% endfor %}
+                    <br><br>
+                  {% endif %}
+                  <a class="btn btn-primary" href="{{i.get_absolute_url}}">Read more →</a>
+            </div>
+            <div class="card-footer">
+                <div class="small text-muted">{{i.created_at | date:"Y-m-d h:m:s"}}</div>
+                <a href="#">{{i.author | upper}}</a>
+            </div>
+        </div>
+          {% endfor %}
+          {% else %}
+            <h5>아무 게시물이 없습니다.</h5>
+          {% endif %}
+
+        <!-- Pagination-->
+        {% if is_paginated %}
+        <nav aria-label="Pagination">
+          <hr class="my-0" />
+          <ul class="pagination justify-content-center my-4">
+              {% if page_obj.has_previous %}
+              <li class="page-item"><a class="page-link" href="?page={{page_obj.previous_page_number}}" tabindex="-1" aria-disabled="true">Newer</a></li>
+              {% else %}
+              <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Newer</a></li>
+              {% endif %}
+              {% if page_obj.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{page_obj.next_page_number}}">Older</a></li>
+              {% else %}
+              <li class="page-item disabled"><a class="page-link" href="#!">Older</a></li>
+              {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+{% endblock %}

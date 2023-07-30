@@ -1,0 +1,71 @@
+1) cmder
+가상환경 활성화 : venv\Scripts\activate.bat
+django 설치 : pip install django
+설치 확인: pip list
+pillow 설치 : pip install pillow
+python -m pip install Pillow
+beautifulsoup4 설치 : pip install beautifulsoup4
+django 프로젝트 생성 : django-admin startproject midPrj .
+       >> 앱 만들기 : python manage.py startapp 이름
+           >> 모델 생성 후 admin에 등록하기
+데이터베이스 생성 : python manage.py migrate -> db.sqlite3 생성됨
+>> python manage.py makemigrations
+   python manage.py migrate
+   python manage.py runserver
+
+관리자계정 생성 : python manage.py createsuperuser  -> (admin, 1234)
+일부만 test : python manage.py test blog.tests.TestView(클래스이름).test_post_list(파일이름)
+
+2) 부트스트랩
+화면 좌우 여백 : div class="container"
+배경색 : bg-info, bg-secondary, bg-warning
+크기와 비율 : col-sm-숫자(비율), col-lg, col-md, col-xl
+허용된 폭 최대로 이미지 조정 : class="img-fluid w-100"
+spacing으로 간격주기 (margin, padding) : my(위 아래 모두, y축방향), mx(왼오 모두, x축방향) mt(top), mb(아래), ml(left), mr(right), m(모든 방향)
+                                        -auto (그 뱡향 마진 최대확보, 로그인 - VScods의 blog.html)
+
+3) 장고
+  ch5.
+ 1. 작동 구조 - MTV 패턴
+  Model: 데이터 구조 정의, 데이터베이스 기록 관리와 쿼리하는 방법을 제공하는 파이썬 객체
+  Template: 웹페이지에서 출력할 모습을 정의하는 텍스트 파일, 사용자에게 전달하기 위해 필요
+  View: HTTP 요청 수신 빛 응답 반환 - 요청 처리 함수
+  URLs: 요청 url 기준으로 HTTP 요정을 적절한 view로 보내주기 위해 사용
+
+
+각 앱 : url에서 템플릿 사용한다고 공지(템플릿 연결) -> 템플릿에서 함수 사용 -> 모델에 함수 정의
+
+
+  ch6. 장고 프로젝트 만들기
+ 1. 웹사이트 구조
+ - 대문페이지(랜딩페이지)
+ - 블로그 페이지 : post list, post detail
+ - 자기소개 페이지 admin
+
+ ch7. 장고 프로젝트에서 앱 개발하기
+  - 앱은 각각 독립된 파일로 구성되어 독립된 기능을 함
+  - 데이터베이스에 Post 모델 반영 : settings.py의 INSTALLED_APPS에 생성한 앱 추가하기
+
+
+CBV: 클래스 이용, 클래스 안 method 호출  -> view 만들기
+>>템플릿 문법
+ - 템플릿 태그 {% 문법 %}
+ - 템플릿 변수와 필터 {{변수|옵션}}    ->   출력 글자 수 제한하기 truncatechars:숫자 (hook_text에서 활용)
+                                       출력 단어 수 제한하기 truncatewords:숫자
+
+ch11.
+>>테스트 코드 작성
+- assertEqual(a,b)  <-> assertNotEqual(a,b)
+- assertIn(a,b) : a in b  <->  assertNotIn(a,b)
+
+- assertTrue(x)  <-> assertFalse(x)
+- assertIs(a,b) : a is b  <-> assertIsNot(a,b)
+- assertNone(x) <-> assertNotNone(x)
+
+ch13.
+다대일 관계 : 포스트와 작성자의 관계
+on_delete=models.CASECADE : 이 포스트의 작성자가 데이터베이스에서 삭제되었을 때 이 포스트도 같이 삭제함
+on_delete=models.SET_NULL : 이 포스트의 작성자가 데이터베이스에서 삭제되었을 때 작성자명을 빈칸으로 둠
+
+>>카테고리
+unique = True : 동일한 이름을 갖는 카테고리 생성불가
